@@ -68,15 +68,15 @@ int main(int argc, char** argv) {
   bitmap::SignedBitmapArray<int64_t> SA(input_size, bits);
   divsufsortxx::constructSA(data, data + input_size, SA.begin(), SA.end(), 256);
 
-  int64_t *SA_test = new int64_t[input_size];
-  divsufsortxx::constructSA(data, data + input_size, SA_test,
-                            SA_test + input_size, 256);
-
   t1 = GetTimestamp();
   fprintf(stderr, "Time taken to construct SA = %llu\n",
           (t1 - t0) / (1000 * 1000));
 
 #ifdef TEST
+  int64_t *SA_test = new int64_t[input_size];
+  divsufsortxx::constructSA(data, data + input_size, SA_test,
+                            SA_test + input_size, 256);
+
   for (uint64_t i = 0; i < input_size; i++) {
     assert(SA_test[i] == int64_t(SA[i]));
   }
