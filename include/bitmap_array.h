@@ -1,5 +1,5 @@
-#ifndef DSL_BITMAP_ARRAY_H_
-#define DSL_BITMAP_ARRAY_H_
+#ifndef BITMAP_BITMAP_ARRAY_H_
+#define BITMAP_BITMAP_ARRAY_H_
 
 #include "bitmap.h"
 

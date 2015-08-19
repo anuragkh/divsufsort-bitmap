@@ -1,11 +1,12 @@
-#ifndef DSL_BITMAP_H_
-#define DSL_BITMAP_H_
+#ifndef BITMAP_BITMAP_H_
+#define BITMAP_BITMAP_H_
 
 #include <cstdint>
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 namespace bitmap {
 
