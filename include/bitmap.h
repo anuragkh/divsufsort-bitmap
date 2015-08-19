@@ -196,24 +196,17 @@ void Bitmap::SetValPos(pos_type pos, data_type val, width_type bits) {
 }
 
 Bitmap::data_type Bitmap::GetValPos(pos_type pos, width_type bits) const {
-  if (bits == 0)
-    return 0;
-
   assert(pos < size_);
 
-  uint64_t val;
-  uint64_t s = pos, e = pos + (bits - 1);
-  uint64_t s_off = s & 0x3F, e_off = e & 0x3F;
-  uint64_t s_idx = s >> 6, e_idx = e >> 6;
+  uint64_t e = pos + bits;
+  uint64_t s_off = pos & 0x3F, e_off = e & 0x3F;
+  uint64_t s_idx = pos >> 6, e_idx = e >> 6;
   if (s_off + bits <= 64) {
-    val = (data_[s_idx] >> (63 - e_off)) & low_bits_set[bits];
+    return (data_[s_idx] >> (64 - e_off)) & low_bits_set[bits];
   } else {
-    uint64_t val1 = (data_[s_idx] << (e_off + 1)) & low_bits_set[bits];
-    uint64_t val2 = data_[e_idx] >> (63 - e_off);
-    val = val1 | val2;
+    return ((data_[s_idx] << e_off) & low_bits_set[bits])
+        | (data_[e_idx] >> (64 - e_off));
   }
-
-  return val;
 }
 
 Bitmap::size_type Bitmap::Serialize(std::ostream& out) {
