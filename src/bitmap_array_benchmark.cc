@@ -20,11 +20,12 @@ int main(int argc, char** argv) {
 
   TimeStamp t0, t1;
 
+
   bitmap::SignedBitmapArray<int64_t> array(ARRAY_SIZE, 30);
 
   t0 = GetTimestamp();
-  for (size_t i = 0; i < array.size(); i++) {
-    array[i] = rand() % array.size();
+  for (size_t i = 0; i < ARRAY_SIZE; i++) {
+    array[i] = i;
   }
   t1 = GetTimestamp();
 
@@ -32,8 +33,8 @@ int main(int argc, char** argv) {
 
   int64_t sum = 0;
   t0 = GetTimestamp();
-  for (size_t i = 0; i < array.size(); i++) {
-    sum += array[rand() % array.size()];
+  for (size_t i = 0; i < ARRAY_SIZE; i++) {
+    sum += array[i];
   }
   t1 = GetTimestamp();
 
@@ -41,8 +42,8 @@ int main(int argc, char** argv) {
 
   int64_t *array1 = new int64_t[ARRAY_SIZE];
   t0 = GetTimestamp();
-  for (size_t i = 0; i < array.size(); i++) {
-    array1[i] = rand() % array.size();
+  for (size_t i = 0; i < ARRAY_SIZE; i++) {
+    array1[i] = i;
   }
   t1 = GetTimestamp();
 
@@ -50,8 +51,8 @@ int main(int argc, char** argv) {
 
   sum = 0;
   t0 = GetTimestamp();
-  for (size_t i = 0; i < array.size(); i++) {
-    sum += array1[rand() % array.size()];
+  for (size_t i = 0; i < ARRAY_SIZE; i++) {
+    sum += array1[i];
   }
   t1 = GetTimestamp();
 
