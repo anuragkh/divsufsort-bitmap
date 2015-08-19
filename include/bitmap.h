@@ -208,9 +208,8 @@ Bitmap::data_type Bitmap::GetValPos(pos_type pos, width_type bits) const {
   if (s_off + bits <= 64) {
     val = (data_[s_idx] >> (63 - e_off)) & low_bits_set[bits];
   } else {
-    uint64_t val1 = data_[s_idx] << s_off;
+    uint64_t val1 = (data_[s_idx] << (e_off + 1)) & low_bits_set[bits];
     uint64_t val2 = data_[e_idx] >> (63 - e_off);
-    val1 = val1 >> (s_off - (e_off + 1));
     val = val1 | val2;
   }
 
