@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
             (t1 - t0), sum);
   }
   {
-    bitmap::UnsignedBitmapArray<uint64_t> array(ARRAY_SIZE, 30);
+    bitmap::SignedBitmapArray<int64_t> array(ARRAY_SIZE, 30);
 
     t0 = GetTimestamp();
     for (size_t i = 0; i < ARRAY_SIZE; i++) {
