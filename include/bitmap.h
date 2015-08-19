@@ -177,13 +177,15 @@ Bitmap::data_type Bitmap::GetValPos(pos_type pos, width_type bits) const {
 
   uint64_t val;
   uint64_t s = pos, e = pos + (bits - 1);
-  if (s % 64 + bits <= 64) {
-    val = data_[s / 64] << (s % 64);
-    val = val >> (63 - e % 64 + s % 64);
+  uint64_t s_off = s & 0x3F, e_off = e & 0x3F;
+  uint64_t s_idx = s >> 6, e_idx = e >> 6;
+  if (s_off + bits <= 64) {
+    val = data_[s_idx] << s_off;
+    val = val >> (63 - e_off + s_off);
   } else {
-    uint64_t val1 = data_[s / 64] << (s % 64);
-    uint64_t val2 = data_[e / 64] >> (63 - e % 64);
-    val1 = val1 >> (s % 64 - (e % 64 + 1));
+    uint64_t val1 = data_[s_idx] << s_off;
+    uint64_t val2 = data_[e_idx] >> (63 - e_off);
+    val1 = val1 >> (s_off - (e_off + 1));
     val = val1 | val2;
   }
 

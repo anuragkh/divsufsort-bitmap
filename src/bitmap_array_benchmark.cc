@@ -20,7 +20,6 @@ int main(int argc, char** argv) {
 
   TimeStamp t0, t1;
 
-
   bitmap::SignedBitmapArray<int64_t> array(ARRAY_SIZE, 30);
 
   t0 = GetTimestamp();
