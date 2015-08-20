@@ -220,8 +220,6 @@ void Bitmap::SetValPos(pos_type pos, data_type val, width_type bits) {
 }
 
 Bitmap::data_type Bitmap::GetValPos(pos_type pos, width_type bits) const {
-  assert(pos < size_);
-
   uint64_t s_off = pos & 0x3F, e_off = (pos + bits) & 0x3F;
   uint64_t s_idx = pos >> 6;
   if (s_off + bits > 64) {

@@ -620,12 +620,9 @@ void SignedBitmapArray<T>::Set(pos_type i, T value) {
 
 template<typename T>
 T SignedBitmapArray<T>::Get(pos_type i) const {
-  assert(i < this->num_elements_);
-  T val = (T) this->GetValPos(i * this->bit_width_, this->bit_width_);
-  if (signs_->GetBit(i)) {
-    val = -val;
-  }
-  return val;
+  T value = (T) this->GetValPos(i * this->bit_width_, this->bit_width_);
+  bool negate = signs_->GetBit(i);
+  return (value ^ -negate) + negate;
 }
 
 template<typename T>
