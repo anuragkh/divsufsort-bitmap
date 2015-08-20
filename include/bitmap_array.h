@@ -30,9 +30,9 @@ class BitmapArray : public Bitmap {
     typedef typename BitmapArray<T>::value_reference reference;
     typedef typename BitmapArray<T>::iterator_category iterator_category;
 
-    value_reference(BitmapArray<T>* array, pos_type pos) {
-      array_ = array;
-      pos_ = pos;
+    value_reference(BitmapArray<T>* array, pos_type pos)
+        : array_(array),
+          pos_(pos) {
     }
 
     value_reference& operator=(T val) {
@@ -129,8 +129,8 @@ class BitmapArray : public Bitmap {
     }
 
    private:
-    BitmapArray<T> *array_;
-    pos_type pos_;
+    BitmapArray<T>* const array_;
+    const pos_type pos_;
   };
 
   // Iterators
@@ -395,43 +395,43 @@ class BitmapArray : public Bitmap {
     return Get(i);
   }
 
-  inline value_reference operator[](const pos_type& i) {
+  value_reference operator[](const pos_type& i) {
     return value_reference(this, i);
   }
 
-  inline iterator begin() {
+  iterator begin() {
     return iterator(this, 0);
   }
 
-  inline const_iterator begin() const {
+  const_iterator begin() const {
     return const_iterator(this, 0);
   }
 
-  inline const_iterator cbegin() const {
+  const_iterator cbegin() const {
     return const_iterator(this, 0);
   }
 
-  inline iterator end() {
+  iterator end() {
     return iterator(this, num_elements_);
   }
 
-  inline const_iterator end() const {
+  const_iterator end() const {
     return iterator(this, num_elements_);
   }
 
-  inline const_iterator cend() const {
+  const_iterator cend() const {
     return iterator(this, num_elements_);
   }
 
-  inline size_type size() {
+  size_type size() const {
     return num_elements_;
   }
 
-  inline size_type max_size() {
+  size_type max_size() const {
     return num_elements_;
   }
 
-  inline bool empty() {
+  bool empty() const {
     return num_elements_ == 0;
   }
 
@@ -622,8 +622,7 @@ void SignedBitmapArray<T>::Set(pos_type i, T value) {
 template<typename T>
 T SignedBitmapArray<T>::Get(pos_type i) const {
   T value = (T) this->GetValPos(i * this->bit_width_, this->bit_width_);
-  bool negate = signs_->GetBit(i);
-  return (value ^ -negate) + negate;
+  return signs_->GetBit(i) ? -value : value;
 }
 
 template<typename T>

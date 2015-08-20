@@ -10,9 +10,9 @@
 
 namespace bitmap {
 
-#define GETBIT(n, i)    ((n >> (63UL - i)) & 1UL)
-#define SETBIT(n, i)    n = (n | (1UL << (63UL - i)))
-#define CLRBIT(n, i)  n = (n & ~(1UL << (63UL - i)))
+#define GETBIT(n, i)    ((n >> i) & 1UL)
+#define SETBIT(n, i)    n = (n | (1UL << i))
+#define CLRBIT(n, i)  n = (n & ~(1UL << i))
 
 #define BITS2BLOCKS(bits) \
     (((bits) % 64 == 0) ? ((bits) / 64) : (((bits) / 64) + 1))
@@ -94,6 +94,30 @@ static const uint64_t low_bits_set[65] = { 0x0000000000000000ULL,
     0x03FFFFFFFFFFFFFFULL, 0x07FFFFFFFFFFFFFFULL, 0x0FFFFFFFFFFFFFFFULL,
     0x1FFFFFFFFFFFFFFFULL, 0x3FFFFFFFFFFFFFFFULL, 0x7FFFFFFFFFFFFFFFULL,
     0xFFFFFFFFFFFFFFFFULL };
+
+static const uint64_t low_bits_unset[65] = { 0xFFFFFFFFFFFFFFFFULL,
+    0xFFFFFFFFFFFFFFFEULL, 0xFFFFFFFFFFFFFFFCULL, 0xFFFFFFFFFFFFFFF8ULL,
+    0xFFFFFFFFFFFFFFF0ULL, 0xFFFFFFFFFFFFFFE0ULL, 0xFFFFFFFFFFFFFFC0ULL,
+    0xFFFFFFFFFFFFFF80ULL, 0xFFFFFFFFFFFFFF00ULL, 0xFFFFFFFFFFFFFE00ULL,
+    0xFFFFFFFFFFFFFC00ULL, 0xFFFFFFFFFFFFF800ULL, 0xFFFFFFFFFFFFF000ULL,
+    0xFFFFFFFFFFFFE000ULL, 0xFFFFFFFFFFFFC000ULL, 0xFFFFFFFFFFFF8000ULL,
+    0xFFFFFFFFFFFF0000ULL, 0xFFFFFFFFFFFE0000ULL, 0xFFFFFFFFFFFC0000ULL,
+    0xFFFFFFFFFFF80000ULL, 0xFFFFFFFFFFF00000ULL, 0xFFFFFFFFFFE00000ULL,
+    0xFFFFFFFFFFC00000ULL, 0xFFFFFFFFFF800000ULL, 0xFFFFFFFFFF000000ULL,
+    0xFFFFFFFFFE000000ULL, 0xFFFFFFFFFC000000ULL, 0xFFFFFFFFF8000000ULL,
+    0xFFFFFFFFF0000000ULL, 0xFFFFFFFFE0000000ULL, 0xFFFFFFFFC0000000ULL,
+    0xFFFFFFFF80000000ULL, 0xFFFFFFFF00000000ULL, 0xFFFFFFFE00000000ULL,
+    0xFFFFFFFC00000000ULL, 0xFFFFFFF800000000ULL, 0xFFFFFFF000000000ULL,
+    0xFFFFFFE000000000ULL, 0xFFFFFFC000000000ULL, 0xFFFFFF8000000000ULL,
+    0xFFFFFF0000000000ULL, 0xFFFFFE0000000000ULL, 0xFFFFFC0000000000ULL,
+    0xFFFFF80000000000ULL, 0xFFFFF00000000000ULL, 0xFFFFE00000000000ULL,
+    0xFFFFC00000000000ULL, 0xFFFF800000000000ULL, 0xFFFF000000000000ULL,
+    0xFFFE000000000000ULL, 0xFFFC000000000000ULL, 0xFFF8000000000000ULL,
+    0xFFF0000000000000ULL, 0xFFE0000000000000ULL, 0xFFC0000000000000ULL,
+    0xFF80000000000000ULL, 0xFF00000000000000ULL, 0xFE00000000000000ULL,
+    0xFC00000000000000ULL, 0xF800000000000000ULL, 0xF000000000000000ULL,
+    0xE000000000000000ULL, 0xC000000000000000ULL, 0x8000000000000000ULL,
+    0x0000000000000000ULL };
 
 class Bitmap {
  public:
@@ -182,28 +206,32 @@ void PrintBits(uint64_t n) {
 }
 
 void Bitmap::SetValPos(pos_type pos, data_type val, width_type bits) {
-  pos_type s = pos, e = pos + (bits - 1);
-  if (s % 64 + bits <= 64) {
-    data_[s / 64] = (data_[s / 64]
-        & (high_bits_set[s % 64] | high_bits_unset[s % 64 + bits]))
-        | (val << (63 - e % 64));
+  pos_type s_off = pos % 64;
+  pos_type s_idx = pos / 64;
+
+  if (s_off + bits <= 64) {
+    // Can be accommodated in 1 bitmap block
+    data_[s_idx] = (data_[s_idx]
+        & (low_bits_set[s_off] | low_bits_unset[s_off + bits])) | val << s_off;
   } else {
-    data_[s / 64] = (data_[s / 64] & high_bits_set[s % 64])
-        | (val >> (e % 64 + 1));
-    data_[e / 64] = (data_[e / 64] & high_bits_unset[e % 64 + 1])
-        | (val << (63 - e % 64));
+    // Must use 2 bitmap blocks
+    data_[s_idx] = (data_[s_idx] & low_bits_set[s_off]) | val << s_off;
+    data_[s_idx + 1] = (data_[s_idx + 1] & low_bits_unset[(s_off + bits) % 64])
+        | (val >> (64 - s_off));
   }
 }
 
 Bitmap::data_type Bitmap::GetValPos(pos_type pos, width_type bits) const {
-  uint64_t e = pos + bits;
-  uint64_t s_off = pos & 0x3F, e_off = e & 0x3F;
-  uint64_t s_idx = pos >> 6, e_idx = e >> 6;
+  pos_type s_off = pos % 64;
+  pos_type s_idx = pos / 64;
+
   if (s_off + bits <= 64) {
-    return (data_[s_idx] >> (64 - e_off)) & low_bits_set[bits];
+    // Can be read from a single block
+    return (data_[s_idx] >> s_off) & low_bits_set[bits];
   } else {
-    return ((data_[s_idx] << e_off) & low_bits_set[bits])
-        | (data_[e_idx] >> (64 - e_off));
+    // Must be read from two blocks
+    return ((data_[s_idx] >> s_off) | (data_[s_idx + 1] << (64 - s_off)))
+        & low_bits_set[bits];
   }
 }
 

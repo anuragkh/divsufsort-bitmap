@@ -11,7 +11,7 @@ static TimeStamp GetTimestamp() {
   return now.tv_usec + (TimeStamp) now.tv_sec * 1000000;
 }
 
-#define ARRAY_SIZE (1024*1024*1024)
+#define ARRAY_SIZE (10*1024*1024)
 
 int main(int argc, char** argv) {
   if (argc > 1) {
