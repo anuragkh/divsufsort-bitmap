@@ -98,18 +98,6 @@ class BitmapArray : public Bitmap {
       rhs = temp;
     }
 
-    friend void swap(reference lhs, reference& rhs) {
-      T temp = T(lhs);
-      lhs = rhs;
-      rhs = temp;
-    }
-
-    friend void swap(reference& lhs, reference rhs) {
-      T temp = T(lhs);
-      lhs = rhs;
-      rhs = temp;
-    }
-
     friend void swap(reference lhs, reference rhs) {
       T temp = T(lhs);
       lhs = rhs;
@@ -486,10 +474,11 @@ class UnsignedBitmapArray : public BitmapArray<T> {
   virtual inline T Get(pos_type i) const override;
 
   inline void swap(const UnsignedBitmapArray<T>& other) {
-    std::swap(this->data_, other.data_);
-    std::swap(this->size_, other.size_);
-    std::swap(this->num_elements_, other.num_elements_);
-    std::swap(this->bit_width_, other.bit_width_);
+    using std::swap;
+    swap(this->data_, other.data_);
+    swap(this->size_, other.size_);
+    swap(this->num_elements_, other.num_elements_);
+    swap(this->bit_width_, other.bit_width_);
   }
 
   // Serialization and De-serialization
@@ -504,7 +493,6 @@ void UnsignedBitmapArray<T>::Set(pos_type i, T value) {
 
 template<typename T>
 T UnsignedBitmapArray<T>::Get(pos_type i) const {
-  assert(i < this->num_elements_);
   Bitmap::data_type val = this->GetValPos(i * this->bit_width_,
                                           this->bit_width_);
   return (T) val;
@@ -553,6 +541,7 @@ class SignedBitmapArray : public BitmapArray<T> {
   typedef typename BitmapArray<T>::size_type size_type;
   typedef typename BitmapArray<T>::width_type width_type;
   typedef typename BitmapArray<T>::pos_type pos_type;
+  typedef typename BitmapArray<T>::data_type data_type;
 
   typedef typename BitmapArray<T>::difference_type difference_type;
   typedef typename BitmapArray<T>::value_type value_type;
@@ -567,24 +556,17 @@ class SignedBitmapArray : public BitmapArray<T> {
 
   SignedBitmapArray()
       : BitmapArray<T>() {
-    signs_ = NULL;
   }
 
   SignedBitmapArray(size_type num_elements, width_type bit_width)
-      : BitmapArray<T>(num_elements, bit_width) {
-    signs_ = new Bitmap(this->num_elements_);
+      : BitmapArray<T>(num_elements, bit_width + 1) {
   }
 
   SignedBitmapArray(T *elements, size_type num_elements, width_type bit_width)
-      : BitmapArray<T>(num_elements, bit_width) {
-    signs_ = new Bitmap(this->num_elements_);
-    for (uint64_t i = 0; i < this->num_elements_; i++) {
-      Set(i, elements[i]);
-    }
+      : BitmapArray<T>(elements, num_elements, bit_width + 1) {
   }
 
   virtual ~SignedBitmapArray() {
-    delete signs_;
   }
 
   // Accessors and mutators
@@ -603,26 +585,22 @@ class SignedBitmapArray : public BitmapArray<T> {
     swap(this->bit_width_, other.bit_width_);
     swap(this->signs_, other.signs_);
   }
-
- private:
-  Bitmap *signs_;
 };
 
 template<typename T>
 void SignedBitmapArray<T>::Set(pos_type i, T value) {
   if (value < 0) {
-    signs_->SetBit(i);
-    value = -value;
+    this->SetValPos(i * this->bit_width_, ((-value) << 1) | 1,
+                    this->bit_width_);
   } else {
-    signs_->UnsetBit(i);
+    this->SetValPos(i * this->bit_width_, value << 1, this->bit_width_);
   }
-  this->SetValPos(i * this->bit_width_, value, this->bit_width_);
 }
 
 template<typename T>
 T SignedBitmapArray<T>::Get(pos_type i) const {
-  T value = (T) this->GetValPos(i * this->bit_width_, this->bit_width_);
-  return signs_->GetBit(i) ? -value : value;
+  T value = this->GetValPos(i * this->bit_width_, this->bit_width_ - 1);
+  return (value & 1) ? -(value >> 1) : (value >> 1);
 }
 
 template<typename T>
@@ -638,7 +616,7 @@ typename SignedBitmapArray<T>::size_type SignedBitmapArray<T>::Serialize(
             sizeof(width_type));
   out_size += sizeof(width_type);
 
-  out_size += signs_->Serialize(out);
+  // out_size += signs_->Serialize(out);
 
   out_size += Bitmap::Serialize(out);
 
@@ -656,7 +634,7 @@ typename SignedBitmapArray<T>::size_type SignedBitmapArray<T>::Deserialize(
   in.read(reinterpret_cast<char *>(&this->bit_width_), sizeof(width_type));
   in_size += sizeof(uint8_t);
 
-  in_size += signs_->Deserialize(in);
+  // in_size += signs_->Deserialize(in);
 
   in_size += Bitmap::Deserialize(in);
 

@@ -11,7 +11,7 @@ static TimeStamp GetTimestamp() {
   return now.tv_usec + (TimeStamp) now.tv_sec * 1000000;
 }
 
-#define ARRAY_SIZE (10*1024*1024)
+#define ARRAY_SIZE (100*1024*1024)
 
 int main(int argc, char** argv) {
   if (argc > 1) {
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
     t0 = GetTimestamp();
     for (size_t i = 0; i < ARRAY_SIZE; i++) {
-      array[i] = i;
+      array.Set(i, i);
     }
     t1 = GetTimestamp();
 
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     t0 = GetTimestamp();
     for (size_t i = 0; i < ARRAY_SIZE; i++) {
       // assert(array[i] == i);
-      sum += array[i];
+      sum += array.Get(i);
     }
     t1 = GetTimestamp();
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 
     t0 = GetTimestamp();
     for (size_t i = 0; i < ARRAY_SIZE; i++) {
-      array[i] = i;
+      array.Set(i, i);
     }
     t1 = GetTimestamp();
 
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     t0 = GetTimestamp();
     for (size_t i = 0; i < ARRAY_SIZE; i++) {
       // assert(array[i] == i);
-      sum += array[i];
+      sum += array.Get(i);
     }
     t1 = GetTimestamp();
 

@@ -162,7 +162,6 @@ Bitmap::Bitmap() {
 }
 
 Bitmap::Bitmap(size_type num_bits) {
-  assert(num_bits > 0);
   data_ = new data_type[BITS2BLOCKS(num_bits)]();
   size_ = num_bits;
 }
