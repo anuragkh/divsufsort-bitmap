@@ -596,11 +596,12 @@ class SignedBitmapArray : public BitmapArray<T> {
   virtual size_type Deserialize(std::istream& in) override;
 
   inline void swap(const SignedBitmapArray<T>& other) {
-    std::swap(this->data_, other.data_);
-    std::swap(this->size_, other.size_);
-    std::swap(this->num_elements_, other.num_elements_);
-    std::swap(this->bit_width_, other.bit_width_);
-    std::swap(this->signs_, other.signs_);
+    using std::swap;
+    swap(this->data_, other.data_);
+    swap(this->size_, other.size_);
+    swap(this->num_elements_, other.num_elements_);
+    swap(this->bit_width_, other.bit_width_);
+    swap(this->signs_, other.signs_);
   }
 
  private:
