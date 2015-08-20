@@ -48,30 +48,34 @@ size_t GetFileSize(std::string& filename) {
 
 int main(int argc, char** argv) {
 
-  if (argc < 2) {
-    fprintf(stderr, "Usage: %s [filename]\n", argv[0]);
-    return -1;
+//  if (argc < 2) {
+//    fprintf(stderr, "Usage: %s [filename]\n", argv[0]);
+//    return -1;
+//  }
+//
+//  // Get filename, filesize
+//  std::string filename = std::string(argv[1]);
+//  size_t filesize = GetFileSize(filename);
+//
+//  TimeStamp t0, t1;
+//  t0 = GetTimestamp();
+//
+//  uint64_t input_size = filesize + 1;
+//  char *data = new char[input_size]();
+//  ReadFromFile(data, filesize, filename);
+//
+//  uint8_t bits = IntegerLog2(input_size + 1);
+//
+//  bitmap::SignedBitmapArray<int64_t> SA(input_size, bits);
+//  divsufsortxx::constructSA(data, data + input_size, SA.begin(), SA.end(), 256);
+//
+//  t1 = GetTimestamp();
+//  fprintf(stderr, "Time taken to construct SA = %llu\n",
+//          (t1 - t0) / (1000 * 1000));
+
+  for (uint8_t i = 0; i < 64; i++) {
+    fprintf(stderr, "0x%016llXULL,\n", 0x8000000000000000ULL >> i);
   }
-
-  // Get filename, filesize
-  std::string filename = std::string(argv[1]);
-  size_t filesize = GetFileSize(filename);
-
-  TimeStamp t0, t1;
-  t0 = GetTimestamp();
-
-  uint64_t input_size = filesize + 1;
-  char *data = new char[input_size]();
-  ReadFromFile(data, filesize, filename);
-
-  uint8_t bits = IntegerLog2(input_size + 1);
-
-  bitmap::SignedBitmapArray<int64_t> SA(input_size, bits);
-  divsufsortxx::constructSA(data, data + input_size, SA.begin(), SA.end(), 256);
-
-  t1 = GetTimestamp();
-  fprintf(stderr, "Time taken to construct SA = %llu\n",
-          (t1 - t0) / (1000 * 1000));
 
 #ifdef TEST
   int64_t *SA_test = new int64_t[input_size];

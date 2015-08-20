@@ -35,94 +35,94 @@ class BitmapArray : public Bitmap {
       pos_ = pos;
     }
 
-    value_reference& operator=(T val) {
+    inline value_reference& operator=(T val) {
       array_->Set(pos_, val);
       return *this;
     }
 
-    value_reference& operator=(const value_reference& ref) {
+    inline value_reference& operator=(const value_reference& ref) {
       return (*this) = T(ref);
     }
 
-    operator T() const {
+    inline operator T() const {
       return array_->Get(pos_);
     }
 
-    value_reference& operator++() {
+    inline value_reference& operator++() {
       T val = array_->Get(pos_);
       array_->Set(pos_, val + 1);
       return *this;
     }
 
-    T operator++(int) {
+    inline T operator++(int) {
       T val = (T) *this;
       ++(*this);
       return val;
     }
 
-    value_reference& operator--() {
+    inline value_reference& operator--() {
       T val = array_->Get(pos_);
       array_->Set(pos_, val - 1);
       return *this;
     }
 
-    T operator--(int) {
+    inline T operator--(int) {
       T val = (T) *this;
       --(*this);
       return val;
     }
 
-    value_reference& operator+=(const T x) {
+    inline value_reference& operator+=(const T x) {
       T val = array_->Get(pos_);
       array_->Set(pos_, val + 1);
       return *this;
     }
 
-    value_reference& operator-=(const T x) {
+    inline value_reference& operator-=(const T x) {
       T val = array_->Get(pos_);
       array_->Set(pos_, val - 1);
       return *this;
     }
 
-    bool operator==(const value_reference& x) const {
+    inline bool operator==(const value_reference& x) const {
       return T(*this) == T(x);
     }
 
-    bool operator<(const value_reference& x) const {
+    inline bool operator<(const value_reference& x) const {
       return T(*this) < T(x);
     }
 
-    friend void swap(reference& lhs, reference& rhs) {
+    inline friend void swap(reference& lhs, reference& rhs) {
       T temp = T(lhs);
       lhs = rhs;
       rhs = temp;
     }
 
-    friend void swap(reference lhs, reference& rhs) {
+    inline friend void swap(reference lhs, reference& rhs) {
       T temp = T(lhs);
       lhs = rhs;
       rhs = temp;
     }
 
-    friend void swap(reference& lhs, reference rhs) {
+    inline friend void swap(reference& lhs, reference rhs) {
       T temp = T(lhs);
       lhs = rhs;
       rhs = temp;
     }
 
-    friend void swap(reference lhs, reference rhs) {
+    inline friend void swap(reference lhs, reference rhs) {
       T temp = T(lhs);
       lhs = rhs;
       rhs = temp;
     }
 
-    friend void swap(reference lhs, T rhs) {
+    inline friend void swap(reference lhs, T rhs) {
       T temp = T(lhs);
       lhs = rhs;
       rhs = temp;
     }
 
-    friend void swap(T lhs, reference rhs) {
+    inline friend void swap(T lhs, reference rhs) {
       T temp = T(rhs);
       rhs = lhs;
       lhs = temp;
@@ -154,43 +154,43 @@ class BitmapArray : public Bitmap {
       pos_ = pos;
     }
 
-    reference operator*() const {
+    inline reference operator*() const {
       return reference(array_, pos_);
     }
 
-    iterator& operator++() {
+    inline iterator& operator++() {
       pos_++;
       return *this;
     }
 
-    iterator operator++(int) {
+    inline iterator operator++(int) {
       iterator it = *this;
       ++(*this);
       return it;
     }
 
-    iterator& operator--() {
+    inline iterator& operator--() {
       pos_--;
       return *this;
     }
 
-    iterator operator--(int) {
+    inline iterator operator--(int) {
       iterator it = *this;
       --(*this);
       return it;
     }
 
-    iterator& operator+=(difference_type i) {
+    inline iterator& operator+=(difference_type i) {
       pos_ += i;
       return *this;
     }
 
-    iterator& operator-=(difference_type i) {
+    inline iterator& operator-=(difference_type i) {
       pos_ -= i;
       return *this;
     }
 
-    iterator& operator=(const iterator& it) {
+    inline iterator& operator=(const iterator& it) {
       if (this != &it) {
         array_ = it.array_;
         pos_ = it.pos_;
@@ -198,45 +198,45 @@ class BitmapArray : public Bitmap {
       return *this;
     }
 
-    iterator operator+(difference_type i) const {
+    inline iterator operator+(difference_type i) const {
       iterator it = *this;
       return it += i;
     }
 
-    iterator operator-(difference_type i) const {
+    inline iterator operator-(difference_type i) const {
       iterator it = *this;
       return it -= i;
     }
 
-    reference operator[](difference_type i) const {
+    inline reference operator[](difference_type i) const {
       return *(*this + i);
     }
 
-    bool operator==(const iterator& it) const {
+    inline bool operator==(const iterator& it) const {
       return it.pos_ == pos_;
     }
 
-    bool operator!=(const iterator& it) const {
+    inline bool operator!=(const iterator& it) const {
       return !(*this == it);
     }
 
-    bool operator<(const iterator& it) const {
+    inline bool operator<(const iterator& it) const {
       return pos_ < it.pos_;
     }
 
-    bool operator>(const iterator& it) const {
+    inline bool operator>(const iterator& it) const {
       return pos_ > it.pos_;
     }
 
-    bool operator>=(const iterator& it) const {
+    inline bool operator>=(const iterator& it) const {
       return !(*this < it);
     }
 
-    bool operator<=(const iterator& it) const {
+    inline bool operator<=(const iterator& it) const {
       return !(*this > it);
     }
 
-    difference_type operator-(const iterator& it) {
+    inline difference_type operator-(const iterator& it) {
       return pos_ - it.pos_;
     }
 
@@ -255,88 +255,88 @@ class BitmapArray : public Bitmap {
     typedef typename BitmapArray<T>::value_reference reference;
     typedef typename BitmapArray<T>::iterator_category iterator_category;
 
-    typedef typename BitmapArray<T>::value_type const_reference;
+    typedef const typename BitmapArray<T>::value_type const_reference;
 
     const_iterator(const BitmapArray<T>* array, pos_type pos) {
       array_ = array;
       pos_ = pos;
     }
 
-    const_reference operator*() const {
+    inline const_reference operator*() const {
       return array_->Get(pos_);
     }
 
-    const_iterator& operator++() {
+    inline const_iterator& operator++() {
       pos_++;
       return *this;
     }
 
-    const_iterator operator++(int) {
+    inline const_iterator operator++(int) {
       const_iterator it = *this;
       ++(*this);
       return it;
     }
 
-    const_iterator& operator--() {
+    inline const_iterator& operator--() {
       pos_--;
       return *this;
     }
 
-    const_iterator operator--(int) {
+    inline const_iterator operator--(int) {
       const_iterator it = *this;
       --(*this);
       return it;
     }
 
-    const_iterator& operator+=(difference_type i) {
+    inline const_iterator& operator+=(difference_type i) {
       pos_ += i;
       return *this;
     }
 
-    const_iterator& operator-=(difference_type i) {
+    inline const_iterator& operator-=(difference_type i) {
       pos_ -= i;
       return *this;
     }
 
-    const_iterator operator+(difference_type i) const {
+    inline const_iterator operator+(difference_type i) const {
       const_iterator it = *this;
       return it += i;
     }
 
-    const_iterator operator-(difference_type i) const {
+    inline const_iterator operator-(difference_type i) const {
       const_iterator it = *this;
       return it -= i;
     }
 
-    const_reference operator[](difference_type i) const {
+    inline const_reference operator[](difference_type i) const {
       return *(*this + i);
     }
 
-    bool operator==(const const_iterator& it) const {
+    inline bool operator==(const const_iterator& it) const {
       return it.pos_ == pos_;
     }
 
-    bool operator!=(const const_iterator& it) const {
+    inline bool operator!=(const const_iterator& it) const {
       return !(*this == it);
     }
 
-    bool operator<(const const_iterator& it) const {
+    inline bool operator<(const const_iterator& it) const {
       return pos_ < it.pos_;
     }
 
-    bool operator>(const const_iterator& it) const {
+    inline bool operator>(const const_iterator& it) const {
       return pos_ > it.pos_;
     }
 
-    bool operator>=(const const_iterator& it) const {
+    inline bool operator>=(const const_iterator& it) const {
       return !(*this < it);
     }
 
-    bool operator<=(const const_iterator& it) const {
+    inline bool operator<=(const const_iterator& it) const {
       return !(*this > it);
     }
 
-    difference_type operator-(const const_iterator& it) {
+    inline difference_type operator-(const const_iterator& it) {
       return pos_ - it.pos_;
     }
 
